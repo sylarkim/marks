@@ -1,0 +1,295 @@
+1.git init
+
+2.git commit -m "123"
+提交到仓库
+-m 输入的是本次提交的说明。
+
+3.git status
+时刻掌握仓库当前的状态
+
+
+4.git diff xxx.txt
+查看区别
+
+5.git log
+查看提交历史记录 
+如果嫌输出信息太多，可以添加参数 --pretty=oneline 
+
+6.git reset --hard HEAD^
+回退到上一个版本.
+上一个版本是HEAD^ ; 上2个版本是HEAD^^ ; 上100个版本是HEAD~100
+--hard 参数:
+
+此方法回退到上一版本后，回不去了，可以通过记住16进制的SHA1计算出来的版本号(只需前几位)，如:
+e1de1753559fa8ed9658a521d251112b05af83af append GPL
+6435ea5fbf5dfea76feea5c682e897fba4f4926a modify readme.txt
+44db3eec4e9f6186719041d1570f503b616c9608 create a readme.txt for git test
+输入 git reset --hard e1de17 (只需输入前几位即可)
+
+或者
+git reflog
+记录你的每一次命令。然后根据版本号恢复。
+
+工作区: Linux/Windows下的文件夹所在目录.
+暂存区Stage(或叫Index): 
+版本库:
+
+git add: 将工作区修改内容添加到暂存区。
+git commit: 将暂存区内容提交到当前分支。
+
+7.git diff HEAD -- xxx.txt 
+查看工作区和版本库里面最新版本的区别。
+
+8.git checkout -- xxx.txt
+丢弃工作区的修改(让文件回到最近一次git commit或git add 状态)。包括2种情况:
+1.xxx.txt修改后还没有放到暂存区，即修改了xxx.txt文件但还没有执行git add操作
+2.xxx.txt修改后提交到暂存区后，又作了修改，现在需要撤销回到暂存区后的状态。
+-- 很重要，没有就变成了"创建一个新分支"的命令。
+
+git reset HEAD readme.txt
+把暂存区stage的修改撤销掉。
+
+git reset即可以回退版本，也可以把暂存区的修改退回到工作区。
+
+场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- file。
+场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD file，就回到了场景1，第二步按场景1操作。
+场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。
+
+9.git rm xxx.txt
+删除文件。
+情况1:确实要删除xxx.txt文件。
+执行 git rm xxx.txt后，再执行 git commit 命令
+情况2:错删了xxx.txt文件
+已执行 git rm xxx.txt，此时工作区和暂存区下都没有了xxx.txt文件。
+1>git reset HEAD -- xxx.txt // 从最新版本库中获取xxx.txt
+2>git checkout -- xxx.txt // 将最新版本库中的xxx.txt文件恢复到工作区
+
+10.ssh-keygen -t rsa -C "xxx@163.com"
+创建ssh-key。会创建一个/root/.ssh/ 文件夹，里面有 id_rsa(私钥) id_rsa.pub(公钥)
+私钥不能泄露，公钥可以放心告诉别人。
+
+登陆github, 打开Account Settings，SSH-key 页面，点击Add SSH Key，title任意，在key文本框里粘贴id_rsa.pub文件内容。
+在github上随便新建个仓库，如smart。
+linux下:
+1>首先在适当的地方创建一个文件夹，然后git init.
+做些修改记录，如创建一个readme.txt，然后git add，git commit。
+2>git remote add origin git@github.com:xxx/smart.git
+3>将本地库的所有内容推送到远程库上.
+git push -u origin master 
+// 第一次推送master分支时，加上-u参数，git不但会把本地的master分支内容推送到远程新的master分支，还会把本地的master
+// 分支和远程的master分支关联起来。
+// 以后的推送就只需要通过命令 git push origin master
+首次使用git的clone或push命令连接github，会得到一个警告，填入yes即可。
+
+提示错误:
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'git@github.com:sylarkim/yond.git'
+hint: Updates were rejected because the tip of your current branch is behind
+
+出现这个错误是因为，在github创建仓库时，我们创建了一个readme.md.然后我们在linux下创建了个main.c文件，
+git add,git commit后，然后推送给远程的yond.git，远程仓库中代码与本地不一致冲突导致。解决方法是:
+
+
+
+小结:
+要关联一个远程库，使用命令:git remote add origin git@github.com:xxx/yyy.git // xxx名字，yyy仓库名
+关联后，使用命令推送:git push -u origin master
+以后推送只需使用:git push origin master
+
+11.正常克隆工作流程
+1>github创建一个仓库.如smart.git
+2>linux下克隆:
+在合适的位置前输入以下命令，如/usr/local ，完成后会多一个/usr/local/smart文件夹。
+git clone git@github.com:xxx/smart.git
+
+12.创建合并删除分支
+创建新分支
+git checkout -b dev
+// 相当于下面的2条指令
+git branch dev // 创建dev分支
+git checkout dev // 切换到dev分支。
+
+git branch // 查看当前分支。
+*master // 当前分支前面会标一个*号。
+如在dev分支上做了修改，正常git add，git commit后，要合并到master上，
+1>git checkout master // 切换回master分支。
+2>git merge dev // 将dev分支合并到master
+git merge用于将指定分支合并到当前分支。
+
+
+git branch -d dev // 删除分支
+git branch // 查看分支
+
+13.解决冲突
+当2个人同时修改了一个文件时，后面merge的人会出错。
+git status // 可以告诉我们冲突的文件
+Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容。
+vi xxx.txt // 修改此文件内容，然后git add，git commit，手动解决冲突。
+
+git log --graph --pretty=oneline --abbrev-commit // 查看分支的合并情况
+其中:
+--graph ASCII字符串表示的简单图形。形象地展示每个提交所在的分支及其分化衍合情况。
+--abbrev-commit git会为你的SHA-1值生成剪短且唯一的缩写，默认为7个字符来表示。
+
+14.合并分支时，git通常用Fast forward模式，这种模式，删除分支后，会丢失分支信息。
+如需禁用Fast forward模式，可使用参数 --no-ff，如:
+git merge --no-ff -m "merge with no-ff" dev
+
+15.当dev工作进行到一半，出现个bug需要立刻处理，而dev内容由于未完成无法提交，可通过
+git stash // 把当前工作现场储藏起来。
+git status // 此时工作区是干净的。
+git checkout master // 切换到主分支。
+git checkout -b bug1 // 新建一个bug1分支
+...
+git add, git commit
+git checkout master
+git merge --no-ff -m "fixed bug1" bug1 // 
+git branch -d bug1 // 删除bug1分支。
+git checkout dev // 切换回dev分支
+git stash list // 查看刚才存储的工作现场。
+1>用 git stash apply 恢复，但stash内容并不删除，需要用 git stash drop 来删除。
+如: git stash apply stash@{0} 
+2>用 git stash pop // 恢复的同时把stash内容也删了，推荐使用。
+git stash list // 再次查看是否还存在内容。
+
+16.
+dev下新建一个分支feature1，在分支feature1上已git add，git commit，再切回dev分支时，
+突然dev不想要feature1分支了，执行
+git branch -d feature1 // 删除分支，失败。改成
+git branch -D feature1 // 强行删除，丢弃一个没有被合并过得分支。
+
+17.git remote
+查看远程库的信息
+-v 显示更详细的信息
+
+git push origin master // 将master分支推送到远程对应的分支上。
+git push origin dev // 推送dev分支。
+
+master分支是主分支，要时刻与远程同步。
+dev分支时开发分支，团队所有成员都在上面工作，所以也需要与远程同步。
+
+抓取分支
+git clone git@githut.com:xxx/smart.git // 克隆分支
+cd smart
+git config user.name "bob"
+git config user.email "bob@126.com"
+git branch // 查看分支。
+
+默认情况下，小伙伴只能看到本地的master分支
+现在，小伙伴要在dev上开发，就必须创建origin的dev分支到本地。
+git checkout -b dev origin/dev
+... // 对dev分支进行add，commit
+git push origin dev
+
+如果碰巧其他人已向origin/dev推送了他的提交，你也对同样文件进行了修改，
+git push origin dev // 推送失败，提示以下错误
+
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'git@github.com:sylarkim/yond.git'
+hint: Updates were rejected because the tip of your current branch is behind
+解决方法:
+git pull // 把最新的提交从origin/dev抓取下来。
+如果git pull也失败，原因是没有指定本地dev分支与远程origin/dev分支的链接，
+git branch --set-upstream dev origin/dev // 设置dev和origin/dev的链接。
+git pull // 再次执行pull操作。
+这回git pull成功，但是合并有冲突，需要手动解决冲突。解决后，add,commit，再push
+git commit -m "xxx"
+git push origin dev
+
+多人协作的工作模式通常为：
+1>试图用 git push origin branch-name 推送自己的修改。
+2>推送失败，则因为远程分支比你本地的更新，需要用 git pull 试图合并
+3>如果 git pull失败，说明远程分支与本地分支的链接关系没有建立，则执行 
+git branch --set-upstream branch-name origin/branch-name // branch-name可以任意命名，如dev
+4>如果合并有冲突，手动解决冲突，add，commit，再git push origin branch-name推送。
+
+git remote -v // 查看远程库信息
+本地新建的分支，如果不推送到远程，对其他人是不可见的。
+推送本地分支: git push origin branch-name 
+
+18.创建标签
+git checkout master // 切换到master分支
+git tag v1.0 // 创建标签
+git tag // 查看所有标签
+
+git log --pretty=oneline --abbrev-commit // 找到历史提交的commit id
+如:
+6a5819e merged bug fix 101
+cc17032 fix bug 101
+7825a50 merge with no-ff
+6224937 add merge
+
+为 add merge打一个标签.
+git tag v0.9 6224937
+git tag // 查看标签。
+git show v0.9 // 查看标签信息
+
+git tag -a v0.1 -m "version 0.1" 3628164
+-a 指定标签名
+-m 指定说明文字
+-s 用秘钥签名一个标签 // 签名采用PGP签名，必须先安装pgp。
+
+git tag -d v0.1 // 删除标签。
+git push origin tagname // 将标签推送到远程。
+git push origin --tags // 一次性推送全部尚未推送到远程的本地标签。
+如果已推送到远程，想删除标签，则
+1>git tag -d v0.9 // 先删除本地的标签
+2>git push origin :refs/tags/v0.9 // 远程删除标签。
+
+19.别人的开源代码，fork到自己本地，自己拥有fork后的仓库的读写权限，
+比如你修改了别人代码，你推送到自己的仓库后，如果希望别人也接受你的修改，需要
+在github上发起一个pull request。
+
+20.git 配置项
+git config --global color.ui true // git会适当地显示不同的颜色。
+
+21.忽略特殊文件
+有些文件，如.o文件，在git status时，会提示Untracked files...
+编写.gitignore文件，如:
+# Windows:
+Thumbs.db
+Desktop.ini
+# Python
+*.py[cod]
+*.so
+将.gitignore提交到Git上。
+
+22.配置别名
+git config --global alias.st status // st代替status
+git st // 相当于git status
+git config --global alias.ci commit
+git config --global alias.br branch
+git config --global alias.co checkout
+以后提交就可以写成:
+git ci -m "xxx"
+--global 参数是全局参数，也就是这些命令在这台电脑的所有git仓库下都有用。
+
+git config --global alias.unstage 'reset HEAD' // 撤销修改
+git config --global alias.last 'log -1' // 显示最近一次的提交
+// 实用技巧
+git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+//git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+--global是针对当前用户起作用，不加，则只针对当前的仓库起作用。
+每个仓库的配置文件都放在.git/config文件中，别名就在[alias]后面，要删除别名，直接把对应的行删除即可。
+当前用户的git配置文件放在主目录的.gitconfig中.配置别名可以直接修改这个文件，如果改错了，可以删掉
+文件通过命令设置。
+
+23.搭建git服务器
+1>sudo apt-get install git // 最好在Ubuntu或Debian下搭建。
+2>sudo adduser git // 创建一个git用户
+3>创建证书登陆，也就是id_rsa.pub文件，把所有公钥导入到/home/git/.ssh/authorized_keys文件里，一行一个
+4>初始化git仓库
+选定一个目录，如/usr/local
+sudo git init --bare smart.git // 创建一个裸仓库，因为服务器上的git仓库纯粹是为了共享，不让用户直接登陆到服务器上去改工作区。
+sudo chown -R git:git smart.git // 把owner改为git
+5>禁用shell登陆。出于安全考虑
+编辑/etc/passwd,找到类似下面的一行:
+git:x:1001:1001:,,,:/home/git:/bin/bash
+改为
+git:x:1001:1001:,,,:/home/git:/usr/bin/git-shell
+这样，git用户可以正常通过ssh使用git，但无法登陆shell。
+6>克隆远程仓库
+git clone git@server:/xxx/smart.git
+
+
+
